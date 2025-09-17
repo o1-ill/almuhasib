@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحاسب الشامل</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .nav-tabs .nav-link {
+            border-radius: 10px 10px 0 0;
+            margin-left: 5px;
+            border: none;
+            background: #f8f9fa;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .admin-section {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .month-filter {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <i class="fas fa-calculator fa-3x text-primary mb-3"></i>
+                <h2>المحاسب الشامل</h2>
+                <p class="text-muted">نظام إدارة الحسابات المتكامل</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">اسم المستخدم</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">كلمة المرور</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-custom w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i>دخول
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- الواجهة الرئيسية -->
+    <div id="mainApp" style="display: none;">
+        <div class="main-container">
+            <!-- الهيدر -->
+            <div class="header-section">
+                <h1><i class="fas fa-calculator me-3"></i>المحاسب الشامل</h1>
+                <p class="mb-0">نظام إدارة الحسابات والمبيعات</p>
+                <div class="mt-3">
+                    <button class="btn btn-light me-2" onclick="showAdminLogin()">
+                        <i class="fas fa-cog me-2"></i>إدارة النظام
+                    </button>
+                    <button class="btn btn-outline-light" onclick="logout()">
+                        <i class="fas fa-sign-out-alt me-2"></i>خروج
+                    </button>
+                </div>
+            </div>
+
+            <!-- التبويبات -->
+            <ul class="nav nav-tabs mb-4" id="mainTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#salesTab">
+                        <i class="fas fa-plus-circle me-2"></i>إضافة مبيعة
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#historyTab">
+                        <i class="fas fa-history me-2"></i>المبيعات السابقة
+                    </a>
+                </li>
+                <li class="nav-item" id="adminTab" style="display: none;">
+                    <a class="nav-link" data-bs-toggle="tab" href="#adminPanel">
+                        <i class="fas fa-tools me-2"></i>لوحة الإدارة
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- تبويب إضافة المبيعات -->
+                <div class="tab-pane fade show active" id="salesTab">
+                    <!-- نموذج إدخال البيانات -->
+                    <div class="form-section">
+                        <h4 class="mb-4"><i class="fas fa-user-plus me-2"></i>إضافة قسيمة جديدة</h4>
+                        <form id="salesForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">اسم الزبون *</label>
+                                    <input type="text" class="form-control" id="customerName" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">رقم الموبايل (اختياري)</label>
+                                    <input type="tel" class="form-control" id="phoneNumber">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">الوزن (كيلو) *</label>
+                                    <input type="number" class="form-control" id="weight" step="0.01" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">سعر السوق *</label>
+                                    <input type="number" class="form-control" id="marketPrice" step="0.01" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">المبلغ الكلي</label>
+                                    <input type="number" class="form-control" id="totalAmount" readonly>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-custom">
+                                <i class="fas fa-plus me-2"></i>إضافة القسيمة
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- الإحصائيات -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h5><i class="fas fa-weight me-2"></i>مجموع الوزن</h5>
+                                <h3 id="totalWeight">0 كيلو</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h5><i class="fas fa-money-bill-wave me-2"></i>مجموع المبالغ</h5>
+                                <h3 id="totalAmountDisplay">0 دينار عراقي</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- جدول البيانات -->
+                    <div class="table-container">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4><i class="fas fa-table me-2"></i>سجل المبيعات اليومية</h4>
+                            <button class="btn btn-success" onclick="exportToExcel()">
+                                <i class="fas fa-file-excel me-2"></i>تصدير إلى Excel
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>التاريخ والوقت</th>
+                                        <th>اسم الزبون</th>
+                                        <th>رقم الموبايل</th>
+                                        <th>الوزن (كيلو)</th>
+                                        <th>سعر السوق</th>
+                                        <th>المبلغ الكلي</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- تبويب المبيعات السابقة -->
+                <div class="tab-pane fade" id="historyTab">
+                    <div class="month-filter">
+                        <h4><i class="fas fa-filter me-2"></i>البحث والتصفية</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label">البحث عن زبون</label>
+                                <input type="text" class="form-control" id="customerSearch" placeholder="ابحث باسم الزبون أو رقم الموبايل...">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">الشهر</label>
+                                <select class="form-control" id="monthFilter">
+                                    <option value="">جميع الشهور</option>
+                                    <option value="1">يناير</option>
+                                    <option value="2">فبراير</option>
+                                    <option value="3">مارس</option>
+                                    <option value="4">أبريل</option>
+                                    <option value="5">مايو</option>
+                                    <option value="6">يونيو</option>
+                                    <option value="7">يوليو</option>
+                                    <option value="8">أغسطس</option>
+                                    <option value="9">سبتمبر</option>
+                                    <option value="10">أكتوبر</option>
+                                    <option value="11">نوفمبر</option>
+                                    <option value="12">ديسمبر</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">السنة</label>
+                                <select class="form-control" id="yearFilter">
+                                    <option value="">جميع السنوات</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-custom d-block w-100" onclick="filterHistory()">
+                                    <i class="fas fa-search me-2"></i>تصفية
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-secondary d-block w-100" onclick="clearFilters()">
+                                    <i class="fas fa-times me-2"></i>مسح الفلاتر
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h5><i class="fas fa-weight me-2"></i>مجموع الوزن المفلتر</h5>
+                                <h3 id="filteredTotalWeight">0 كيلو</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <h5><i class="fas fa-money-bill-wave me-2"></i>مجموع المبالغ المفلترة</h5>
+                                <h3 id="filteredTotalAmount">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <h4><i class="fas fa-history me-2"></i>المبيعات السابقة</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>التاريخ والوقت</th>
+                                        <th>اسم الزبون</th>
+                                        <th>رقم الموبايل</th>
+                                        <th>الوزن (كيلو)</th>
+                                        <th>سعر السوق</th>
+                                        <th>المبلغ الكلي</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- لوحة الإدارة -->
+                <div class="tab-pane fade" id="adminPanel">
+                    <div class="admin-section">
+                        <h4><i class="fas fa-shield-alt me-2"></i>لوحة إدارة النظام</h4>
+                        <p>يمكنك من هنا تعديل أو حذف أي من البيانات المسجلة</p>
+                    </div>
+
+                    <div class="table-container">
+                        <h4><i class="fas fa-edit me-2"></i>تعديل البيانات</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>التاريخ والوقت</th>
+                                        <th>اسم الزبون</th>
+                                        <th>رقم الموبايل</th>
+                                        <th>الوزن (كيلو)</th>
+                                        <th>سعر السوق</th>
+                                        <th>المبلغ الكلي</th>
+                                        <th>الإجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تسجيل دخول الإدارة -->
+    <div class="modal fade" id="adminLoginModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">دخول الإدارة</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="adminLoginForm">
+                        <div class="mb-3">
+                            <label class="form-label">الرمز السري للإدارة</label>
+                            <input type="password" class="form-control" id="adminPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">دخول</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل البيانات -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل البيانات</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editIndex">
+                        <div class="mb-3">
+                            <label class="form-label">اسم الزبون</label>
+                            <input type="text" class="form-control" id="editCustomerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">رقم الموبايل</label>
+                            <input type="tel" class="form-control" id="editPhoneNumber">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">الوزن (كيلو)</label>
+                            <input type="number" class="form-control" id="editWeight" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">سعر السوق</label>
+                            <input type="number" class="form-control" id="editMarketPrice" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">حفظ التعديلات</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // بيانات النظام
+        let salesData = JSON.parse(localStorage.getItem('salesData')) || [];
+        let isAdminLoggedIn = false;
+
+        // تسجيل الدخول الرئيسي
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'aboabaas' && password === 'mahdimem05abaas20') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                loadSalesData();
+                populateYearFilter();
+            } else {
+                alert('اسم المستخدم أو كلمة المرور غير صحيحة');
+            }
+        });
+
+        // حساب المبلغ الكلي تلقائياً
+        document.getElementById('weight').addEventListener('input', calculateTotal);
+        document.getElementById('marketPrice').addEventListener('input', calculateTotal);
+
+        function calculateTotal() {
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const price = parseFloat(document.getElementById('marketPrice').value) || 0;
+            const total = weight * price;
+            document.getElementById('totalAmount').value = total.toFixed(2);
+        }
+
+        // إضافة قسيمة جديدة
+        document.getElementById('salesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customerName = document.getElementById('customerName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const marketPrice = parseFloat(document.getElementById('marketPrice').value);
+            const totalAmount = weight * marketPrice;
+            
+            const newSale = {
+                id: Date.now(),
+                date: new Date().toLocaleString('ar-EG', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }),
+                customerName,
+                phoneNumber,
+                weight,
+                marketPrice,
+                totalAmount,
+                timestamp: new Date()
+            };
+            
+            salesData.push(newSale);
+            localStorage.setItem('salesData', JSON.stringify(salesData));
+            
+            // إعادة تعيين النموذج
+            this.reset();
+            document.getElementById('totalAmount').value = '';
+            
+            // تحديث العرض
+            loadSalesData();
+            updateStats();
+            populateYearFilter(); // تحديث قائمة السنوات
+            
+            alert('تم إضافة القسيمة بنجاح!');
+        });
+
+        // تحميل بيانات المبيعات
+        function loadSalesData() {
+            const tbody = document.getElementById('salesTableBody');
+            tbody.innerHTML = '';
+            
+            // عرض مبيعات اليوم الحالي فقط
+            const today = new Date().toDateString();
+            const todaySales = salesData.filter(sale => 
+                new Date(sale.timestamp).toDateString() === today
+            );
+            
+            todaySales.forEach(sale => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${sale.date}</td>
+                    <td>${sale.customerName}</td>
+                    <td>${sale.phoneNumber || '-'}</td>
+                    <td>${sale.weight}</td>
+                    <td>${sale.marketPrice}</td>
+                    <td>${sale.totalAmount % 1 === 0 ? sale.totalAmount.toString() : sale.totalAmount.toFixed(2)} دينار عراقي</td>
+                `;
+            });
+            
+            updateStats();
+        }
+
+        // تحديث الإحصائيات
+        function updateStats() {
+            const today = new Date().toDateString();
+            const todaySales = salesData.filter(sale => 
+                new Date(sale.timestamp).toDateString() === today
+            );
+            
+            const totalWeight = todaySales.reduce((sum, sale) => sum + sale.weight, 0);
+            const totalAmount = todaySales.reduce((sum, sale) => sum + sale.totalAmount, 0);
+            
+            document.getElementById('totalWeight').textContent = (totalWeight % 1 === 0 ? totalWeight.toString() : totalWeight.toFixed(2)) + ' كيلو';
+            document.getElementById('totalAmountDisplay').textContent = (totalAmount % 1 === 0 ? totalAmount.toString() : totalAmount.toFixed(2)) + ' دينار عراقي';
+        }
+
+        // تصدير إلى Excel
+        function exportToExcel() {
+            const ws = XLSX.utils.json_to_sheet(salesData.map(sale => ({
+                'التاريخ والوقت': sale.date,
+                'اسم الزبون': sale.customerName,
+                'رقم الموبايل': sale.phoneNumber || '-',
+                'الوزن (كيلو)': sale.weight,
+                'سعر السوق': sale.marketPrice,
+                'المبلغ الكلي (دينار عراقي)': sale.totalAmount % 1 === 0 ? sale.totalAmount.toString() : sale.totalAmount.toFixed(2)
+            })));
+            
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'المبيعات');
+            XLSX.writeFile(wb, 'مبيعات_المحاسب_الشامل.xlsx');
+        }
+
+        // ملء فلتر السنوات
+        function populateYearFilter() {
+            const yearFilter = document.getElementById('yearFilter');
+            // مسح الخيارات الموجودة (عدا الخيار الأول)
+            while (yearFilter.children.length > 1) {
+                yearFilter.removeChild(yearFilter.lastChild);
+            }
+            
+            if (salesData.length > 0) {
+                const years = [...new Set(salesData.map(sale => 
+                    new Date(sale.timestamp).getFullYear()
+                ))].sort((a, b) => b - a);
+                
+                years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearFilter.appendChild(option);
+                });
+            }
+        }
+
+        // تصفية المبيعات السابقة
+        function filterHistory() {
+            const month = document.getElementById('monthFilter').value;
+            const year = document.getElementById('yearFilter').value;
+            const searchTerm = document.getElementById('customerSearch').value.toLowerCase().trim();
+            
+            let filteredData = salesData;
+            
+            // تصفية حسب البحث
+            if (searchTerm) {
+                filteredData = filteredData.filter(sale => 
+                    sale.customerName.toLowerCase().includes(searchTerm) ||
+                    (sale.phoneNumber && sale.phoneNumber.includes(searchTerm))
+                );
+            }
+            
+            // تصفية حسب الشهر
+            if (month) {
+                filteredData = filteredData.filter(sale => {
+                    const saleDate = new Date(sale.timestamp);
+                    return saleDate.getMonth() + 1 == parseInt(month);
+                });
+            }
+            
+            // تصفية حسب السنة
+            if (year) {
+                filteredData = filteredData.filter(sale => {
+                    const saleDate = new Date(sale.timestamp);
+                    return saleDate.getFullYear() == parseInt(year);
+                });
+            }
+            
+            displayHistoryData(filteredData);
+        }
+
+        // مسح جميع الفلاتر
+        function clearFilters() {
+            document.getElementById('monthFilter').value = '';
+            document.getElementById('yearFilter').value = '';
+            document.getElementById('customerSearch').value = '';
+            displayHistoryData(salesData);
+        }
+
+        // عرض بيانات المبيعات السابقة
+        function displayHistoryData(data) {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td colspan="6" class="text-center py-4">
+                        <i class="fas fa-exclamation-circle fa-2x text-muted mb-2"></i>
+                        <br>
+                        <strong>لا توجد مبيعات في الفترة المحددة</strong>
+                        <br>
+                        <small class="text-muted">جرب تغيير معايير البحث أو التصفية</small>
+                    </td>
+                `;
+            } else {
+                data.forEach(sale => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${sale.date}</td>
+                        <td>${sale.customerName}</td>
+                        <td>${sale.phoneNumber || '-'}</td>
+                        <td>${sale.weight}</td>
+                        <td>${sale.marketPrice}</td>
+                        <td>${sale.totalAmount % 1 === 0 ? sale.totalAmount.toString() : sale.totalAmount.toFixed(2)} دينار عراقي</td>
+                    `;
+                });
+            }
+            
+            // تحديث إحصائيات المرشح
+            const totalWeight = data.reduce((sum, sale) => sum + sale.weight, 0);
+            const totalAmount = data.reduce((sum, sale) => sum + sale.totalAmount, 0);
+            
+            document.getElementById('filteredTotalWeight').textContent = (totalWeight % 1 === 0 ? totalWeight.toString() : totalWeight.toFixed(2)) + ' كيلو';
+            document.getElementById('filteredTotalAmount').textContent = (totalAmount % 1 === 0 ? totalAmount.toString() : totalAmount.toFixed(2)) + ' دينار عراقي';
+        }
+
+        // عرض نافذة دخول الإدارة
+        function showAdminLogin() {
+            const modal = new bootstrap.Modal(document.getElementById('adminLoginModal'));
+            modal.show();
+        }
+
+        // تسجيل دخول الإدارة
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === 'mmkk12zz2w8Ab') {
+                isAdminLoggedIn = true;
+                document.getElementById('adminTab').style.display = 'block';
+                loadAdminData();
+                
+                // إغلاق النافذة والانتقال لتبويب الإدارة
+                bootstrap.Modal.getInstance(document.getElementById('adminLoginModal')).hide();
+                const adminTabLink = document.querySelector('[href="#adminPanel"]');
+                const tab = new bootstrap.Tab(adminTabLink);
+                tab.show();
+                
+                alert('تم دخول وضع الإدارة بنجاح');
+            } else {
+                alert('الرمز السري غير صحيح');
+            }
+        });
+
+        // تحميل بيانات الإدارة
+        function loadAdminData() {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+            
+            salesData.forEach((sale, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${sale.date}</td>
+                    <td>${sale.customerName}</td>
+                    <td>${sale.phoneNumber || '-'}</td>
+                    <td>${sale.weight}</td>
+                    <td>${sale.marketPrice}</td>
+                    <td>${sale.totalAmount % 1 === 0 ? sale.totalAmount.toString() : sale.totalAmount.toFixed(2)} دينار عراقي</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-1" onclick="editSale(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSale(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        // تعديل بيانات المبيعة
+        function editSale(index) {
+            const sale = salesData[index];
+            
+            document.getElementById('editIndex').value = index;
+            document.getElementById('editCustomerName').value = sale.customerName;
+            document.getElementById('editPhoneNumber').value = sale.phoneNumber;
+            document.getElementById('editWeight').value = sale.weight;
+            document.getElementById('editMarketPrice').value = sale.marketPrice;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editModal'));
+            modal.show();
+        }
+
+        // حفظ التعديلات
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const index = parseInt(document.getElementById('editIndex').value);
+            const customerName = document.getElementById('editCustomerName').value;
+            const phoneNumber = document.getElementById('editPhoneNumber').value;
+            const weight = parseFloat(document.getElementById('editWeight').value);
+            const marketPrice = parseFloat(document.getElementById('editMarketPrice').value);
+            
+            salesData[index] = {
+                ...salesData[index],
+                customerName,
+                phoneNumber,
+                weight,
+                marketPrice,
+                totalAmount: weight * marketPrice
+            };
+            
+            localStorage.setItem('salesData', JSON.stringify(salesData));
+            
+            bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            loadAdminData();
+            loadSalesData();
+            populateYearFilter(); // تحديث قائمة السنوات
+            
+            alert('تم حفظ التعديلات بنجاح');
+        });
+
+        // حذف مبيعة
+        function deleteSale(index) {
+            if (confirm('هل أنت متأكد من حذف هذه المبيعة؟')) {
+                salesData.splice(index, 1);
+                localStorage.setItem('salesData', JSON.stringify(salesData));
+                loadAdminData();
+                loadSalesData();
+                populateYearFilter(); // تحديث قائمة السنوات
+                alert('تم حذف المبيعة بنجاح');
+            }
+        }
+
+        // تسجيل الخروج
+        function logout() {
+            if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                isAdminLoggedIn = false;
+                document.getElementById('adminTab').style.display = 'none';
+            }
+        }
+
+        // تحميل البيانات عند فتح تبويب المبيعات السابقة
+        document.querySelector('[href="#historyTab"]').addEventListener('click', function() {
+            displayHistoryData(salesData);
+        });
+
+        // البحث التلقائي أثناء الكتابة
+        document.getElementById('customerSearch').addEventListener('input', function() {
+            filterHistory();
+        });
+
+        // تحميل البيانات الأولية
+        if (salesData.length > 0) {
+            populateYearFilter();
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980c4db541bc3e85',t:'MTc1ODE1MDkwNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</script>
+<footer class="text-center text-xs italic text-gray-300 mt-12 pb-6 border-t border-white/8">
+    Developed by <span class="font-semibold text-white italic">Maryam Mahdi © 2025 </span>
+</footer>
+</body>
+</html>
