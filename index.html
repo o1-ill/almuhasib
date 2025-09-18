@@ -215,9 +215,6 @@
                                     <label class="form-label">المبلغ الكلي</label>
                                     <input type="number" class="form-control" id="totalAmount" readonly>
                                 </div>
-                                <div class="col-md-12 mb-3">
-  <label class="form-label">ملاحظات (اختياري)</label>
-  <textarea class="form-control" id="notes" rows="2" placeholder="اكتب أي ملاحظات حول الطلب (اختياري)"></textarea>
                             </div>
                             <button type="submit" class="btn btn-custom">
                                 <i class="fas fa-plus me-2"></i>إضافة القسيمة
@@ -259,8 +256,6 @@
                                         <th>الوزن (كيلو)</th>
                                         <th>سعر السوق</th>
                                         <th>المبلغ الكلي</th>
-                                        <th>الملاحظات</th>
-
                                     </tr>
                                 </thead>
                                 <tbody id="salesTableBody">
@@ -347,8 +342,6 @@
                                         <th>الوزن (كيلو)</th>
                                         <th>سعر السوق</th>
                                         <th>المبلغ الكلي</th>
-                                        <th>الملاحظات</th>
-
                                     </tr>
                                 </thead>
                                 <tbody id="historyTableBody">
@@ -479,38 +472,35 @@
         }
 
         // إضافة قسيمة جديدة
-       document.getElementById('salesForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const customerName = document.getElementById('customerName').value;
-    const phoneNumber = document.getElementById('phoneNumber').value;
-    const weight = parseFloat(document.getElementById('weight').value);
-    const marketPrice = parseFloat(document.getElementById('marketPrice').value);
-    const totalAmount = weight * marketPrice;
-    const notes = document.getElementById('notes').value; // <-- الملاحظات
-    
-    const newSale = {
-        id: Date.now(),
-        date: new Date().toLocaleString('ar-EG', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        }),
-        customerName,
-        phoneNumber,
-        weight,
-        marketPrice,
-        totalAmount,
-        notes, // <-- نخزن الملاحظات هنا
-        timestamp: new Date()
-    };
-    
-    salesData.push(newSale);
-    localStorage.setItem('salesData', JSON.stringify(salesData));
-
+        document.getElementById('salesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customerName = document.getElementById('customerName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const marketPrice = parseFloat(document.getElementById('marketPrice').value);
+            const totalAmount = weight * marketPrice;
+            
+            const newSale = {
+                id: Date.now(),
+                date: new Date().toLocaleString('ar-EG', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }),
+                customerName,
+                phoneNumber,
+                weight,
+                marketPrice,
+                totalAmount,
+                timestamp: new Date()
+            };
+            
+            salesData.push(newSale);
+            localStorage.setItem('salesData', JSON.stringify(salesData));
             
             // إعادة تعيين النموذج
             this.reset();
@@ -544,7 +534,6 @@
                     <td>${sale.weight}</td>
                     <td>${sale.marketPrice}</td>
                     <td>${sale.totalAmount % 1 === 0 ? sale.totalAmount.toString() : sale.totalAmount.toFixed(2)} دينار عراقي</td>
-                    <td>${sale.notes || '-'}</td> 
                 `;
             });
             
@@ -654,7 +643,7 @@
             if (data.length === 0) {
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td colspan="5" class="text-center py-4">
+                    <td colspan="6" class="text-center py-4">
                         <i class="fas fa-exclamation-circle fa-2x text-muted mb-2"></i>
                         <br>
                         <strong>لا توجد مبيعات في الفترة المحددة</strong>
@@ -672,8 +661,6 @@
                         <td>${sale.weight}</td>
                         <td>${sale.marketPrice}</td>
                         <td>${sale.totalAmount % 1 === 0 ? sale.totalAmount.toString() : sale.totalAmount.toFixed(2)} دينار عراقي</td>
-                        <td>${sale.notes || '-'}</td>
-
                     `;
                 });
             }
@@ -728,8 +715,6 @@
                     <td>${sale.weight}</td>
                     <td>${sale.marketPrice}</td>
                     <td>${sale.totalAmount % 1 === 0 ? sale.totalAmount.toString() : sale.totalAmount.toFixed(2)} دينار عراقي</td>
-                    <td>${sale.notes || '-'}</td>
-
                     <td>
                         <button class="btn btn-sm btn-warning me-1" onclick="editSale(${index})">
                             <i class="fas fa-edit"></i>
@@ -831,6 +816,3 @@
 </footer>
 </body>
 </html>
-
-
-
